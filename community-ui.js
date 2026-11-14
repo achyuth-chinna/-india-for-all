@@ -1,6 +1,6 @@
 (() => {
  'use strict';
- const BASE='https://india-for-all-research-api.katojuachyuth.workers.dev';
+ const BASE='https://api.wevotefor.in';
  const $=id=>document.getElementById(id),tr=s=>window.SiteI18n?.t(s)||s;
  const store={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}},remove(k){try{localStorage.removeItem(k)}catch{}}};
  let token=store.get('ifa-community-session'),sessionPromise=null;

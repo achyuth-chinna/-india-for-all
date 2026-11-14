@@ -1,5 +1,5 @@
 import {session,body,rate,json,Problem,text,publicCacheKey} from './community.js';
-const ORIGIN='https://india-for-all.katojuachyuth.workers.dev',uuid=/^[a-f0-9-]{36}$/;
+const ORIGIN='https://wevotefor.in',uuid=/^[a-f0-9-]{36}$/;
 const stamp=()=>Math.floor(Date.now()/1000);
 function publicLink(value){if(!value)return '';const s=text(value,2000);let u;try{u=new URL(s)}catch{throw new Problem('Use a public HTTPS media link.')}if(u.protocol!=='https:'||u.username||u.password||!u.hostname.includes('.')||/^(\d|\[)/.test(u.hostname)||/\.(local|internal|localhost)$/.test(u.hostname))throw new Problem('Use a public HTTPS media link.');return u.href}
 export async function handlePosts(req,env,ctx,authorized){

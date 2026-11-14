@@ -1,3 +1,3 @@
 User-agent: *
 Allow: /
-Sitemap: https://india-for-all.katojuachyuth.workers.dev/sitemap.xml
+Sitemap: https://wevotefor.in/sitemap.xml

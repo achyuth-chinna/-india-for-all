@@ -1,4 +1,4 @@
-const ORIGIN='https://india-for-all.katojuachyuth.workers.dev';
+const ORIGIN='https://wevotefor.in';
 const encoder=new TextEncoder();
 const now=()=>Math.floor(Date.now()/1000);
 const uid=/^[a-f0-9-]{36}$/;

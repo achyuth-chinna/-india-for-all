@@ -1,53 +1,23 @@
-# India for All — D1 database and reviewed publishing API
+# India for All research backend
 
-This backend is **committed but not deployed**. The existing static website is unchanged and remains live.
+The API and D1 database are deployed independently of the public static website.
 
-## One-time Cloudflare setup
+## Daily research intake
 
-1. In Cloudflare Dashboard → Storage & databases → D1, create a database named `india-for-all-research`.
-2. Copy its **database ID** from Cloudflare.
-3. Use a Cloudflare API token or Wrangler login locally with access to this account.
-4. In this `backend` directory, copy `wrangler.example.jsonc` to `wrangler.jsonc` and replace `REPLACE_WITH_REAL_D1_DATABASE_ID`.
-5. Install Wrangler using `npm install --save-dev wrangler` (or run via `npx wrangler`).
-6. Apply the schema: `npx wrangler d1 execute india-for-all-research --remote --file=./schema.sql`.
-7. Set a long, random admin secret: `npx wrangler secret put ADMIN_TOKEN`.
-8. Deploy **from the backend directory**: `npx wrangler deploy`.
-9. Copy the resulting API URL; do not assume it is the same hostname as the existing website.
+The existing India Public Impact Research task runs each morning around 08:00 Asia/Kolkata. It researches original public sources and uses connected GitHub tools to update `backend/intake/research.json` on main. The file is public: include research candidates only, never personal information or credentials. If GitHub tools are unavailable during a scheduled run, the task must report that intake was not updated.
 
-**Do not configure the existing website's deploy command to point at this backend folder.** It is intentionally a separate Worker to avoid breaking the public site.
+The API Worker runs `17 * * * *` (UTC), hourly at minute 17. Its scheduled handler fetches the intake file from the fixed GitHub URL, validates the whole batch (maximum 50 items), and inserts only unpublished drafts. The identity is a hash of source URL, reporting period, region and title. Repeated runs skip existing identities, never reset editorial decisions, and append an audit event only for a new insertion. Changed titles or URLs can create a new candidate; editors must still check semantic duplicates. Removing a candidate from GitHub does not remove its database record.
 
-## Publishing workflow
+Each candidate requires title, summary, category, region, source_name, source_url and reporting_period. Include evidence_note with source table/page and limitations. Optional string fields are source_published_on, metric_value and metric_unit. Category: education, healthcare, public_spending, crime, other. Read source documents before adding claims. Do not include status or review fields; importer ignores them and forces draft status.
 
-- `POST /api/admin/research`: create a draft with a required official source, reporting period and evidence summary.
-- `POST /api/admin/research/:id/submit`: mark draft as in review.
-- `POST /api/admin/research/:id/publish`: publish only after human review; requires a JSON `note` explaining verification.
-- `POST /api/admin/research/:id/reject`: reject.
-- `GET /api/admin/research?status=in_review`: private review queue.
-- `GET /api/research`: public endpoint; returns **published only**.
-- `GET /api/health`: health check.
+The importer has no public write endpoint and requires no ADMIN_TOKEN. Only existing GitHub repository writers can change the fixed intake file. Source quality is checked by researchers and editors; structural validation does not establish factual accuracy.
 
-Admin calls require `Authorization: Bearer <ADMIN_TOKEN>`. **Never** put the admin token into public HTML, browser JavaScript, GitHub, or screenshots. Use a trusted server-side client (or curl locally). This initial API has one shared admin token, not separate submitter/reviewer identities. For production editorial teams, add authentication, roles and rate limiting.
+## Editorial workflow
 
-### Example (from your own terminal, not browser developer console)
+Open `/admin` on the research API Worker and use the existing secret privately. Select Drafts to see imported candidates. Submit a candidate for review, inspect its original source, then publish with a verification note or reject. The public `/api/research` returns published records only. Public website JavaScript must never contain the token. Cloudflare Access has not been configured.
 
-```bash
-export API_BASE='https://YOUR-API-WORKER.workers.dev'
-read -rs ADMIN_TOKEN
-curl -X POST "$API_BASE/api/admin/research" \
-  -H "Authorization: Bearer $ADMIN_TOKEN" \
-  -H 'Content-Type: application/json' \
-  -d '{"title":"Example draft — do not publish","summary":"Source and definitions must be checked","category":"education","region":"India","source_name":"Official report","source_url":"https://education.gov.in/","reporting_period":"2024–25"}'
-```
+Admin routes require Bearer authorization: GET/POST `/api/admin/research`, POST `/api/admin/research/:id/submit`, `/publish`, or `/reject`. `/api/health` checks Worker configuration; `/api/research` queries D1. Health alone does not establish database health.
 
-## Daily research integration
+## Operations
 
-The existing ChatGPT daily research automation produces reports but **cannot directly write to D1**. A future scheduled importer can create *drafts only*, with a distinct restricted service token and source validation; a human must approve publication. Never configure automatic publish for scraped or AI-generated claims.
-
-## Security and data policy
-
-- All public reads filter `status='published'`.
-- Review actions append to an audit trail.
-- Do not accept personal health stories, names, or sensitive personal data in this database.
-- Restrict CORS and admin access before connecting a browser-based admin console.
-- Back up D1 regularly and test restore; plan migrations and monitoring.
-- The review token is shared and audit identity is generic `admin` until authenticated accounts are added.
+Git pushes to main trigger automatic builds for both Workers. The backend root is `backend`; keep the static site's configuration separate. D1 binding DB points to india-for-all-research. ADMIN_TOKEN remains a Cloudflare secret. Intake logs report candidates/imported counts without payloads or credentials. Check scheduled invocation logs for failures; never claim ingestion succeeded from a Git commit alone. No automatic publication is permitted.

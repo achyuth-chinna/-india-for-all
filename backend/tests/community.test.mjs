@@ -7,7 +7,7 @@ function statement(sql,args=[]){return {bind(...values){return statement(sql,val
 const DB={prepare:statement,async batch(items){db.exec('BEGIN');try{const result=items.map(x=>({meta:{changes:Number(db.prepare(x.sql).run(...x.args).changes)}}));db.exec('COMMIT');return result}catch(e){db.exec('ROLLBACK');throw e}}};
 const env={DB,ADMIN_TOKEN:'test-only-admin-secret-not-a-real-credential',COMMUNITY_LIMITER:{limit:async()=>({success:true})},SESSION_LIMITER:{limit:async()=>({success:true})},READ_LIMITER:{limit:async()=>({success:true})}};
 const auth=r=>r.headers.get('Authorization')==='Bearer test-only-admin-secret-not-a-real-credential';
-async function call(path,method='GET',data,token,admin=false,origin='https://india-for-all.katojuachyuth.workers.dev'){
+async function call(path,method='GET',data,token,admin=false,origin='https://wevotefor.in'){
  const headers={'Origin':origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1'};if(token)headers['X-Community-Session']=token;if(admin)headers.Authorization='Bearer '+env.ADMIN_TOKEN;
  const req=new Request('https://api.example'+path,{method,headers,body:data?JSON.stringify(data):undefined});Object.defineProperty(req,'cf',{value:{country:'IN',region:'Telangana'}});
  const r=await handleCommunity(req,env,{waitUntil(){}},auth,null);return {status:r.status,data:await r.json()};

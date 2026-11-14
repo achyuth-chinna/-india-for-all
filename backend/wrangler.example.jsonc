@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "india-for-all-research-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-14",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "india-for-all-research",
+      "database_id": "REPLACE_WITH_REAL_D1_DATABASE_ID"
+    }
+  ]
+}

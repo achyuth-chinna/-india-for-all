@@ -43,7 +43,7 @@ export function publicCacheKey(req){
  const names=source.pathname==='/api/research'?['limit','region','category']:source.pathname==='/api/community/comments'?['root','after','before']:[];
  for(const name of names){const value=source.searchParams.get(name);if(value!==null)url.searchParams.set(name,value.slice(0,150))}return new Request(url,{method:'GET'});
 }
-export async function cleanupCommunity(env){const cutoff=now()-86400*30;await env.DB.batch([env.DB.prepare('DELETE FROM community_visitors WHERE last_seen<?').bind(cutoff),env.DB.prepare('DELETE FROM community_pageviews WHERE day<?').bind(new Date(cutoff*1000).toISOString().slice(0,10))])}
+export async function cleanupCommunity(env){const cutoff=now()-86400*30;await env.DB.batch([env.DB.prepare('DELETE FROM community_visitors WHERE last_seen<?').bind(cutoff),env.DB.prepare('DELETE FROM community_pageviews WHERE day<?').bind(new Date(cutoff*1000).toISOString().slice(0,10)),env.DB.prepare('DELETE FROM community_analytics_optouts WHERE created_at<?').bind(cutoff)])}
 export async function guardAdmin(req,env,authorized){
  if(!new URL(req.url).pathname.startsWith('/api/admin/'))return null;
  if(authorized(req,env))return null;
@@ -97,7 +97,7 @@ export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.ca
    const alias=text(data.alias,50,true),city=text(data.city,80),content=text(data.body,1500,true),parent=data.parent_id||null;
    let root='',depth=0;if(parent){if(!uid.test(parent))throw new Problem('Invalid reply.');const p=await env.DB.prepare('SELECT root_id,depth,status FROM community_comments WHERE id=?').bind(parent).first();if(!p||p.status!=='visible')throw new Problem('This comment cannot receive replies.');depth=p.depth+1;if(depth>5)throw new Problem('Reply depth limit reached.');root=p.root_id}
    const recent=await env.DB.prepare('SELECT created_at FROM community_comments WHERE session_id=? ORDER BY created_at DESC LIMIT 1').bind(id).first();if(recent&&stamp-recent.created_at<15)throw new Problem('Please wait 15 seconds between comments.',429);
-   const commentId=crypto.randomUUID();await env.DB.prepare('INSERT INTO community_comments(id,parent_id,root_id,depth,session_id,alias,city,body,created_at) VALUES(?,?,?,?,?,?,?,?,?)').bind(commentId,parent,root||commentId,depth,id,alias,city,content,stamp).run();return json({ok:true,id:commentId,root_id:root||commentId},201);
+   const commentId=crypto.randomUUID();const inserted=await env.DB.prepare('INSERT INTO community_comments(id,parent_id,root_id,depth,session_id,alias,city,body,created_at) SELECT ?,?,?,?,?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM community_comments WHERE session_id=? AND created_at>?)').bind(commentId,parent,root||commentId,depth,id,alias,city,content,stamp,id,stamp-15).run();if(inserted.meta?.changes!==1)throw new Problem('Please wait 15 seconds between comments.',429);return json({ok:true,id:commentId,root_id:root||commentId},201);
   }
   if(path==='/api/community/react'){
    const target=data.target_id;if(target!=='campaign'&&!uid.test(target||''))throw new Problem('Invalid reaction.');
@@ -115,6 +115,9 @@ export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.ca
    const r=await env.DB.prepare("UPDATE community_comments SET status='hidden',alias='',city='',body='' WHERE id=? AND session_id=?").bind(data.id,id).run();
    if(r.meta?.changes!==1)throw new Problem('Comment not available in this browser.',403);return json({ok:true});
   }
+  if(path==='/api/community/analytics-consent'){
+   if(data.consent!==true)throw new Problem('Analytics consent required.');await env.DB.prepare('DELETE FROM community_analytics_optouts WHERE session_id=?').bind(id).run();return json({ok:true});
+  }
   if(path==='/api/community/visit'){
    if(data.consent!==true)throw new Problem('Analytics consent required.');
    const day=new Date().toISOString().slice(0,10),visitor=await digest(env,'visitor:'+day+':'+id);
@@ -122,12 +125,12 @@ export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.ca
    const country=String(req.cf?.country||'Unknown').slice(0,60),region=String(req.cf?.region||'Unknown').slice(0,80);
    const device=/mobile|android|iphone/i.test(req.headers.get('User-Agent')||'')?'Mobile':'Desktop or tablet';const increment=data.pageview===true?1:0;
    await env.DB.batch([
-    env.DB.prepare('INSERT INTO community_visitors(day,visitor_key,country,region,device,path,first_seen,last_seen,views) VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(day,visitor_key) DO UPDATE SET last_seen=excluded.last_seen,path=excluded.path,views=community_visitors.views+excluded.views').bind(day,visitor,country,region,device,page,stamp,stamp,increment),
-    env.DB.prepare('INSERT INTO community_pageviews(day,path,views) VALUES(?,?,?) ON CONFLICT(day,path) DO UPDATE SET views=views+excluded.views').bind(day,page,increment)
+    env.DB.prepare('INSERT INTO community_visitors(day,visitor_key,country,region,device,path,first_seen,last_seen,views) SELECT ?,?,?,?,?,?,?,?,? WHERE NOT EXISTS(SELECT 1 FROM community_analytics_optouts WHERE session_id=?) ON CONFLICT(day,visitor_key) DO UPDATE SET last_seen=excluded.last_seen,path=excluded.path,views=community_visitors.views+excluded.views').bind(day,visitor,country,region,device,page,stamp,stamp,increment,id),
+    env.DB.prepare('INSERT INTO community_pageviews(day,path,views) SELECT ?,?,? WHERE NOT EXISTS(SELECT 1 FROM community_analytics_optouts WHERE session_id=?) ON CONFLICT(day,path) DO UPDATE SET views=views+excluded.views').bind(day,page,increment,id)
    ]);return json({ok:true});
   }
   if(path==='/api/community/forget-analytics'){
-   const statements=[];for(let n=0;n<31;n++){const day=new Date(Date.now()-n*86400000).toISOString().slice(0,10),visitor=await digest(env,'visitor:'+day+':'+id);statements.push(env.DB.prepare('DELETE FROM community_visitors WHERE day=? AND visitor_key=?').bind(day,visitor))}await env.DB.batch(statements);return json({ok:true});
+   const statements=[env.DB.prepare('INSERT INTO community_analytics_optouts(session_id,created_at) VALUES(?,?) ON CONFLICT(session_id) DO UPDATE SET created_at=excluded.created_at').bind(id,stamp)];for(let n=0;n<31;n++){const day=new Date(Date.now()-n*86400000).toISOString().slice(0,10),visitor=await digest(env,'visitor:'+day+':'+id);statements.push(env.DB.prepare('DELETE FROM community_visitors WHERE day=? AND visitor_key=?').bind(day,visitor))}await env.DB.batch(statements);return json({ok:true});
   }
   throw new Problem('Not found.',404);
  }catch(e){return json({error:e instanceof Problem?e.message:'Community temporarily unavailable. Please try again later.'},e instanceof Problem?e.status:503,e?.status===429?{'Retry-After':'60'}:{})}

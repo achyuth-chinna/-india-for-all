@@ -41,6 +41,9 @@ await call('/api/community/visit','POST',{path:'/',consent:true,pageview:false},
 const analytics=(await call('/api/admin/community/analytics','GET',undefined,undefined,true)).data;assert.equal(analytics.active,1);assert.equal(analytics.today.visitors,1);assert.equal(analytics.today.pageviews,1);assert.equal(analytics.recent[0].region,'Telangana');
 assert(!JSON.stringify(analytics).includes('192.0.2.1'));assert(!JSON.stringify(analytics).includes(token));
 await call('/api/community/forget-analytics','POST',{},token);assert.equal((await call('/api/admin/community/analytics','GET',undefined,undefined,true)).data.active,0);
+await call('/api/community/visit','POST',{path:'/',consent:true,pageview:true},token);assert.equal((await call('/api/admin/community/analytics','GET',undefined,undefined,true)).data.active,0);
+await call('/api/community/analytics-consent','POST',{consent:true},token);await call('/api/community/visit','POST',{path:'/',consent:true,pageview:true},token);assert.equal((await call('/api/admin/community/analytics','GET',undefined,undefined,true)).data.active,1);
+await call('/api/community/forget-analytics','POST',{},token);
 await cleanupCommunity(env);
 await call('/api/community/withdraw','POST',{},token);assert.equal((await call('/api/community/stats')).data.support,0);
 const started=performance.now();
@@ -63,4 +66,6 @@ assert.equal((await call('/api/community/remove-comment','POST',{id:root},token)
 assert.equal(db.prepare('SELECT body,alias,city FROM community_comments WHERE id=?').get(root).body,'');
 assert.equal(publicCacheKey(new Request('https://api.example/api/community/stats?junk=123')).url,'https://api.example/api/community/stats');
 assert(!JSON.stringify((await call('/api/community/comments')).data).includes(env.ADMIN_TOKEN));
+const commentRace=await Promise.all(Array.from({length:10},()=>call('/api/community/comment','POST',{alias:'Concurrency test',body:'Only one should be inserted',public_consent:true},sessions[1])));assert.equal(commentRace.filter(x=>x.status===201).length,1);assert.equal(commentRace.filter(x=>x.status===429).length,9);
 console.log('Passed malformed choices, oversized body, SQL-injection payload, unauthorized erasure, own-comment erasure, cache-busting normalization and secret non-disclosure checks.');
+console.log('Passed 10 competing comment submissions: one insertion, nine throttled; analytics opt-out resists late heartbeat until explicit re-consent.');

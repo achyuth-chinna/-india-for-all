@@ -60,7 +60,7 @@
  function showAnalytics(){
   document.getElementById('analytics-choice')?.remove();const panel=element('aside',undefined,'analytics-choice');panel.id='analytics-choice';panel.setAttribute('aria-label','Visitor statistics');
   panel.append(element('p','Allow anonymous visitor statistics? We record your page, broad region and device category for up to 30 days. No names, raw IP addresses or precise location. Voting works without analytics.'));
-  const allow=button('Allow statistics',()=>{store.set('ifa-analytics','yes');panel.remove();startAnalytics()});const decline=button('No thanks',()=>{store.set('ifa-analytics','no');panel.remove()});panel.append(allow,decline);const link=element('a','Privacy and community rules');link.href='/privacy.html';panel.append(link);document.querySelector('footer').before(panel);
+  const allow=button('Allow statistics',async b=>{b.disabled=true;try{await api('/api/community/analytics-consent','POST',{consent:true});store.set('ifa-analytics','yes');panel.remove();startAnalytics()}catch{b.disabled=false}});const decline=button('No thanks',()=>{store.set('ifa-analytics','no');panel.remove();clearInterval(heartbeat);heartbeat=null;if(token)api('/api/community/forget-analytics','POST',{}).catch(()=>{})});panel.append(allow,decline);const link=element('a','Privacy and community rules');link.href='/privacy.html';panel.append(link);document.querySelector('footer').before(panel);
  }
  if(store.get('ifa-analytics')==='yes')startAnalytics();else if(!store.get('ifa-analytics'))showAnalytics();
  const settings=document.getElementById('analytics-settings');if(settings)settings.onclick=()=>showAnalytics();

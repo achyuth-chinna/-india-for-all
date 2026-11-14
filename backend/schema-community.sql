@@ -12,6 +12,7 @@ CREATE INDEX IF NOT EXISTS community_reports_date ON community_reports(created_a
 CREATE TABLE IF NOT EXISTS community_visitors (day TEXT NOT NULL,visitor_key TEXT NOT NULL,country TEXT NOT NULL,region TEXT NOT NULL,device TEXT NOT NULL,path TEXT NOT NULL,first_seen INTEGER NOT NULL,last_seen INTEGER NOT NULL,views INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(day,visitor_key));
 CREATE INDEX IF NOT EXISTS community_visitors_live ON community_visitors(last_seen DESC);
 CREATE TABLE IF NOT EXISTS community_pageviews(day TEXT NOT NULL,path TEXT NOT NULL,views INTEGER NOT NULL DEFAULT 0,PRIMARY KEY(day,path));
+CREATE TABLE IF NOT EXISTS community_analytics_optouts(session_id TEXT PRIMARY KEY,created_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS community_moderation(id INTEGER PRIMARY KEY AUTOINCREMENT,comment_id TEXT NOT NULL,action TEXT NOT NULL,occurred_at INTEGER NOT NULL);
 CREATE TRIGGER IF NOT EXISTS community_vote_insert AFTER INSERT ON community_votes BEGIN UPDATE community_totals SET support=support+(NEW.choice=1),oppose=oppose+(NEW.choice=-1) WHERE id=1; END;
 CREATE TRIGGER IF NOT EXISTS community_vote_update AFTER UPDATE OF choice ON community_votes BEGIN UPDATE community_totals SET support=support+(NEW.choice=1)-(OLD.choice=1),oppose=oppose+(NEW.choice=-1)-(OLD.choice=-1) WHERE id=1; END;

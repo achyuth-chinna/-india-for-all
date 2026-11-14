@@ -45,7 +45,10 @@ export default {
     if(region){where.push('region=?');args.push(region.slice(0,100))}
     if(category){if(!validCategories.has(category))return fail('Invalid category');where.push('category=?');args.push(category)}
     const result=await env.DB.prepare('SELECT '+columns+' FROM research_items WHERE '+where.join(' AND ')+' ORDER BY published_at DESC LIMIT ?').bind(...args,limit).all();
-    return reply({items:result.results||[],count:(result.results||[]).length});
+    const response=reply({items:result.results||[],count:(result.results||[]).length});
+    response.headers.set('Access-Control-Allow-Origin','https://india-for-all.katojuachyuth.workers.dev');
+    response.headers.set('Vary','Origin');
+    return response;
    }
    if(!authorized(req,env))return fail('Unauthorized',401);
    if(req.method==='GET'&&path==='/api/admin/research'){

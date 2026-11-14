@@ -1,0 +1,66 @@
+import {DatabaseSync} from 'node:sqlite';
+import {readFileSync} from 'node:fs';
+import assert from 'node:assert/strict';
+import {handleCommunity,cleanupCommunity,guardAdmin,publicCacheKey} from '../src/community.js';
+const db=new DatabaseSync(':memory:');db.exec(readFileSync(new URL('../schema-community.sql',import.meta.url),'utf8'));
+function statement(sql,args=[]){return {bind(...values){return statement(sql,values)},async run(){const r=db.prepare(sql).run(...args);return {meta:{changes:Number(r.changes)}}},async all(){return {results:db.prepare(sql).all(...args)}},async first(){return db.prepare(sql).get(...args)||null},sql,args}}
+const DB={prepare:statement,async batch(items){db.exec('BEGIN');try{const result=items.map(x=>({meta:{changes:Number(db.prepare(x.sql).run(...x.args).changes)}}));db.exec('COMMIT');return result}catch(e){db.exec('ROLLBACK');throw e}}};
+const env={DB,ADMIN_TOKEN:'test-only-admin-secret-not-a-real-credential',COMMUNITY_LIMITER:{limit:async()=>({success:true})},SESSION_LIMITER:{limit:async()=>({success:true})},READ_LIMITER:{limit:async()=>({success:true})}};
+const auth=r=>r.headers.get('Authorization')==='Bearer test-only-admin-secret-not-a-real-credential';
+async function call(path,method='GET',data,token,admin=false,origin='https://india-for-all.katojuachyuth.workers.dev'){
+ const headers={'Origin':origin,'Content-Type':'application/json','CF-Connecting-IP':'192.0.2.1'};if(token)headers['X-Community-Session']=token;if(admin)headers.Authorization='Bearer '+env.ADMIN_TOKEN;
+ const req=new Request('https://api.example'+path,{method,headers,body:data?JSON.stringify(data):undefined});Object.defineProperty(req,'cf',{value:{country:'IN',region:'Telangana'}});
+ const r=await handleCommunity(req,env,{waitUntil(){}},auth,null);return {status:r.status,data:await r.json()};
+}
+const token=(await call('/api/community/session','POST',{})).data.token;
+assert.equal((await call('/api/community/vote','POST',{choice:1},token+'x')).status,401);
+assert.equal((await call('/api/community/vote','POST',{choice:1},token,false,'https://evil.example')).status,403);
+assert.equal((await call('/api/community/vote','POST',{choice:1,alias:'private',city:'private'},token)).status,200);
+assert.equal((await call('/api/community/supporters')).data.items.length,0);
+assert.equal((await call('/api/community/vote','POST',{choice:1,public_profile:true},token)).status,400);
+await call('/api/community/vote','POST',{choice:-1,public_profile:true,alias:'Test alias',city:'Test city'},token);
+let counts=(await call('/api/community/stats')).data;assert.equal(counts.support,0);assert.equal(counts.oppose,1);
+await call('/api/community/vote','POST',{choice:1},token);counts=(await call('/api/community/stats')).data;assert.equal(counts.support,1);assert.equal(counts.oppose,0);
+for(const value of [1,1,-1,0])await call('/api/community/react','POST',{target_id:'campaign',choice:value},token);
+counts=(await call('/api/community/stats')).data;assert.equal(counts.likes,0);assert.equal(counts.dislikes,0);
+assert.equal((await call('/api/community/comment','POST',{alias:'Test',body:'No consent'},token)).status,400);
+const posted=await call('/api/community/comment','POST',{alias:'Test',body:'<script>alert(1)</script>',public_consent:true},token);assert.equal(posted.status,201);
+const root=posted.data.id;let parent=root;
+for(let depth=1;depth<=6;depth++){
+ const t=(await call('/api/community/session','POST',{})).data.token;
+ const r=await call('/api/community/comment','POST',{alias:'Test reply',body:'Nested reply',parent_id:parent,public_consent:true},t);
+ if(depth<=5){assert.equal(r.status,201);parent=r.data.id}else assert.equal(r.status,400);
+}
+assert.equal((await call('/api/community/comments?root='+root)).data.items.length,6);
+assert.equal((await call('/api/admin/community/analytics')).status,401);
+await call('/api/admin/community/moderate','POST',{id:root,status:'hidden'},undefined,true);
+const hidden=(await call('/api/community/comments')).data.items[0];assert.equal(hidden.body,'Comment hidden by moderator.');assert.equal(hidden.alias,'');assert(!JSON.stringify(hidden).includes('session_id'));
+assert.equal((await call('/api/community/visit','POST',{path:'/',consent:false},token)).status,400);
+await call('/api/community/visit','POST',{path:'/',consent:true,pageview:true},token);
+await call('/api/community/visit','POST',{path:'/',consent:true,pageview:false},token);
+const analytics=(await call('/api/admin/community/analytics','GET',undefined,undefined,true)).data;assert.equal(analytics.active,1);assert.equal(analytics.today.visitors,1);assert.equal(analytics.today.pageviews,1);assert.equal(analytics.recent[0].region,'Telangana');
+assert(!JSON.stringify(analytics).includes('192.0.2.1'));assert(!JSON.stringify(analytics).includes(token));
+await call('/api/community/forget-analytics','POST',{},token);assert.equal((await call('/api/admin/community/analytics','GET',undefined,undefined,true)).data.active,0);
+await cleanupCommunity(env);
+await call('/api/community/withdraw','POST',{},token);assert.equal((await call('/api/community/stats')).data.support,0);
+const started=performance.now();
+const sessions=await Promise.all(Array.from({length:2000},async()=> (await call('/api/community/session','POST',{})).data.token));
+await Promise.all(sessions.map(t=>call('/api/community/vote','POST',{choice:1},t)));
+assert.equal((await call('/api/community/stats')).data.support,2000);
+console.log('Passed auth, origin checks, consent, vote updates/withdrawal, atomic counters, reactions, nested depth, moderation, privacy, analytics, retention and 2,000 simultaneous simulated sessions.');
+console.log('Local SQLite exercise took '+Math.round(performance.now()-started)+' ms; not a Cloudflare capacity benchmark.');
+env.READ_LIMITER.limit=async()=>({success:false});assert.equal((await call('/api/community/stats')).status,429);env.READ_LIMITER.limit=async()=>({success:true});
+let failures=0;env.ADMIN_LIMITER={limit:async()=>({success:++failures<=10})};
+for(let i=0;i<50;i++){const r=await guardAdmin(new Request('https://api.example/api/admin/research',{headers:{Authorization:'Bearer wrong-'+i,'CF-Connecting-IP':'192.0.2.1'}}),env,auth);assert.equal(r.status,i<10?401:429)}
+assert.equal(await guardAdmin(new Request('https://api.example/api/admin/research',{headers:{Authorization:'Bearer '+env.ADMIN_TOKEN}}),env,auth),null);
+console.log('Passed 50 simulated admin brute-force attempts: 10 unauthorized, 40 throttled; valid admin access preserved.');
+env.COMMUNITY_LIMITER.limit=async()=>({success:true});
+for(const value of [0,true,null,99,'1',{},[]])assert.equal((await call('/api/community/vote','POST',{choice:value},token)).status,400);
+assert.equal((await call('/api/community/comment','POST',{alias:'x',body:'x'.repeat(9000),public_consent:true},token)).status,413);
+assert.equal((await call('/api/community/comments?root='+encodeURIComponent("' OR 1=1--"))).status,400);
+assert.equal((await call('/api/community/remove-comment','POST',{id:root},sessions[0])).status,403);
+assert.equal((await call('/api/community/remove-comment','POST',{id:root},token)).status,200);
+assert.equal(db.prepare('SELECT body,alias,city FROM community_comments WHERE id=?').get(root).body,'');
+assert.equal(publicCacheKey(new Request('https://api.example/api/community/stats?junk=123')).url,'https://api.example/api/community/stats');
+assert(!JSON.stringify((await call('/api/community/comments')).data).includes(env.ADMIN_TOKEN));
+console.log('Passed malformed choices, oversized body, SQL-injection payload, unauthorized erasure, own-comment erasure, cache-busting normalization and secret non-disclosure checks.');

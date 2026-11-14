@@ -54,7 +54,7 @@ export default {
     if(category){if(!validCategories.has(category))return fail('Invalid category');where.push('category=?');args.push(category)}
     const result=await env.DB.prepare('SELECT '+columns+' FROM research_items WHERE '+where.join(' AND ')+' ORDER BY published_at DESC LIMIT ?').bind(...args,limit).all();
     const response=reply({items:result.results||[],count:(result.results||[]).length});
-    response.headers.set('Access-Control-Allow-Origin','https://wevotefor.in');
+    response.headers.set('Access-Control-Allow-Origin',req.headers.get('Origin')==='https://india-for-all.katojuachyuth.workers.dev'?'https://india-for-all.katojuachyuth.workers.dev':'https://wevotefor.in');
     response.headers.set('Vary','Origin');
     response.headers.set('Cache-Control','public, max-age=10, s-maxage=15');
     if(ctx&&globalThis.caches?.default)ctx.waitUntil(caches.default.put(publicCacheKey(req),response.clone()));

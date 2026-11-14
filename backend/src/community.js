@@ -56,7 +56,7 @@ export async function protectResearch(req,env,cache=globalThis.caches?.default){
  if(req.method!=='GET'||new URL(req.url).pathname!=='/api/research')return null;
  try{await rate(req,env,'research-read');return cache?await cache.match(publicCacheKey(req)):null}catch(e){return json({error:e.message},e.status||503)}
 }
-export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.caches?.default){
+async function handleCommunityInternal(req,env,ctx,authorized,cache=globalThis.caches?.default){
  const url=new URL(req.url),path=url.pathname,isAdmin=path.startsWith('/api/admin/community');
  if(!path.startsWith('/api/community/')&&!isAdmin)return null;
  try{
@@ -64,7 +64,7 @@ export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.ca
   if(!env.DB)throw new Problem('Community temporarily unavailable.',503);
   if(isAdmin){if(!authorized(req,env))throw new Problem('Unauthorized',401);return await admin(req,env,url)}
   if(req.method==='POST'){
-   if(req.headers.get('Origin')!==ORIGIN)throw new Problem('This action must come from the website.',403);
+   if(![ORIGIN,'https://india-for-all.katojuachyuth.workers.dev'].includes(req.headers.get('Origin')))throw new Problem('This action must come from the website.',403);
    await rate(req,env,path==='/api/community/session'?'session':path==='/api/community/visit'?'visit':'write');
   }
   if(req.method==='GET')await rate(req,env,'read');
@@ -155,3 +155,6 @@ async function admin(req,env,url){
 }
 
 export {session,body,rate,json,Problem,text};
+
+// Keep the former site working while DNS and certificates propagate.
+export async function handleCommunity(...args){let response=await handleCommunityInternal(...args);if(response&&args[0].headers.get('Origin')==='https://india-for-all.katojuachyuth.workers.dev'){response=new Response(response.body,response);response.headers.set('Access-Control-Allow-Origin','https://india-for-all.katojuachyuth.workers.dev')}return response}

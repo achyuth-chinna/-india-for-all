@@ -8,6 +8,7 @@ export async function handlePosts(req,env,ctx,authorized){
  try{
   const admin=path.startsWith('/api/admin/');if(admin&&!authorized(req,env))throw new Problem('Unauthorized',401);
   if(req.method==='OPTIONS')return new Response(null,{status:204,headers:{'Access-Control-Allow-Origin':ORIGIN,'Access-Control-Allow-Headers':'Content-Type, X-Community-Session, X-Upload-Type','Access-Control-Allow-Methods':'GET, POST, OPTIONS','Access-Control-Max-Age':'86400'}});
+  if(!admin&&env.PUBLIC_POSTS_ENABLED!=='true'){if(req.method==='GET'&&path==='/api/community/uploads')return json({enabled:false,posts_enabled:false});throw new Problem('Public issue posts are disabled until storage is ready.',503)}
   if(req.method==='GET')await rate(req,env,'read');
   if(!admin&&req.method==='POST'){if(req.headers.get('Origin')!==ORIGIN)throw new Problem('This action must come from the website.',403);await rate(req,env,'write')}
   if(req.method==='GET'&&path==='/api/community/uploads')return json({enabled:Boolean(env.MEDIA),image_limit:5242880,video_limit:26214400});

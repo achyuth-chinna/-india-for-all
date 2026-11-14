@@ -1,3 +1,7 @@
+# Current status: public issue posts disabled
+
+No subscription activation is authorized. Public post reads, submissions, reports and uploads are disabled by default on the API. The website shows an unavailable notice without a form. Existing records and administrator moderation are preserved. Future enablement requires an explicit PUBLIC_POSTS_ENABLED=true Worker variable plus restoration of the form, after storage is ready.
+
 # Public issue posts and family examples
 
 Apply backend/schema-posts.sql after schema-community.sql before deploying. Public text and HTTPS media-link posts require explicit consent and administrator approval. External media is opened only on visitor choice; it is not fetched by the server. Approved posts use existing nested discussions. Admin can publish posts or permanently erase post content and its discussion; individual comment erasure includes descendants. Copies held by other visitors cannot be recalled.

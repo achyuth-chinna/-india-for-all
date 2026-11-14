@@ -1,6 +1,6 @@
 (() => {
  const $=id=>document.getElementById(id),client=window.CommunityClient;
- if(!$('public-posts')||!client)return;
+ if(!$('public-posts')||!$('issue-form')||!client)return;
  const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n};
  const authored=(tag,text)=>{const n=el(tag,text);n.setAttribute('translate','no');return n};
  const button=(text,fn)=>{const b=el('button',text);b.type='button';b.className='outline';b.onclick=async()=>{b.disabled=true;try{await fn()}catch(e){$('issue-notice').textContent=e.message}finally{b.disabled=false}};return b};

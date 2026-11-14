@@ -1,3 +1,4 @@
+import { adminHtml } from './admin-page.js';
 // Cloudflare Worker API backed by D1. Review required before publication.
 const JSON_HEADERS = {'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'};
 const reply = (data,status=200)=>new Response(JSON.stringify(data),{status,headers:JSON_HEADERS});
@@ -32,6 +33,7 @@ async function audit(db,id,action,actor,note=''){
 export default {
  async fetch(req,env){
   const url=new URL(req.url),path=url.pathname;
+  if(req.method==='GET'&&path==='/admin'){return new Response(adminHtml,{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff','x-frame-options':'DENY','referrer-policy':'no-referrer','content-security-policy':"default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"}})}
   if(!path.startsWith('/api/'))return fail('Not found',404);
   if(!env.DB)return fail('Database not configured',503);
   try{

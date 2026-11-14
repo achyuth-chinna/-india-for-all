@@ -16,7 +16,7 @@
  const authored=(tag,text,cls)=>{const n=element(tag,text,cls);n.setAttribute('translate','no');return n};
  function notice(text){if($('community-notice'))$('community-notice').textContent=text}
  async function action(button,task){button.disabled=true;try{await task()}catch(e){notice(e.message)}finally{button.disabled=false}}
- let campaignReaction=0,myVote=0,replyTo=null,nextRoot=null,roots=[],threads=new Map(),ownComments=new Set();
+ let campaignReaction=0,myVote=0,replyTo=null,nextRoot=null,roots=[],threads=new Map(),ownComments=new Set(),currentTopic=null;
  async function stats(){if(!$('support-count')||document.hidden)return;try{const j=await api('/api/community/stats');for(const [id,key] of [['support-count','support'],['oppose-count','oppose'],['comment-count','comments'],['like-count','likes'],['dislike-count','dislikes']])$(id).textContent=Number(j[key]||0).toLocaleString('en-IN')}catch(e){notice(e.message)}}
  async function supporters(){if(!$('supporters-list')||document.hidden)return;try{const j=await api('/api/community/supporters'),list=$('supporters-list');list.replaceChildren();if(!j.items.length){list.append(element('p','No public profiles yet. Be the first to share your support.'));return}for(const item of j.items){const card=element('article',undefined,'community-voice');card.append(authored('strong',[item.alias,item.city].filter(Boolean).join(' · ')),element('p',item.choice===1?'My vote is for education and healthcare.':'I disagree with this proposal.'));list.append(card)}}catch{}}
  function voteMessage(){if(!$('my-vote'))return;$('my-vote').textContent=myVote===1?'Your current vote: support.':myVote===-1?'Your current vote: disagree.':'You have not voted in this browser.'}
@@ -27,7 +27,7 @@
  function drawComment(item,children,seen=new Set()){
   if(seen.has(item.id))return element('div');seen.add(item.id);
   const card=element('article',undefined,'community-comment');card.dataset.commentId=item.id;
-  if(item.status==='hidden'){card.append(element('p','Comment hidden by moderator.','community-hidden'))}else{
+  if(item.topic){card.append(authored('h4',item.body))}else if(item.status==='hidden'){card.append(element('p','Comment hidden by moderator.','community-hidden'))}else{
    card.append(authored('strong',[item.alias,item.city].filter(Boolean).join(' · ')),authored('p',item.body,'comment-body'));
    const time=element('time',new Date(item.created_at*1000).toLocaleString(document.documentElement.lang||'en'));time.dateTime=new Date(item.created_at*1000).toISOString();card.append(time);
    const actions=element('div',undefined,'community-actions');
@@ -40,7 +40,7 @@
   return card;
  }
  function renderComments(){const list=$('comments-list');list.replaceChildren();if(!roots.length){list.append(element('p','No comments yet. Share your opinion.'));return}for(const root of roots){const thread=threads.get(root.id),byParent=new Map();for(const item of thread?.items||[]){if(item.id===root.id)continue;const a=byParent.get(item.parent_id)||[];a.push(item);byParent.set(item.parent_id,a)}const card=drawComment(root,byParent);card.append(button(thread?.next?'More replies':'View replies',b=>action(b,()=>loadThread(root.id,Boolean(thread?.next)))));list.append(card)}$('more-comments').hidden=!nextRoot}
- async function comments(more=false){try{const j=await api('/api/community/comments'+(more&&nextRoot?'?before='+nextRoot:''));roots=more?[...roots,...j.items]:j.items;nextRoot=j.next;renderComments()}catch(e){notice(e.message)}}
+ async function comments(more=false){try{const j=await api('/api/community/comments'+(more&&nextRoot?'?before='+nextRoot:''));roots=more?[...roots,...j.items]:[...(currentTopic?[currentTopic]:[]),...j.items];nextRoot=j.next;renderComments()}catch(e){notice(e.message)}}
  async function loadThread(root,more=false){const old=threads.get(root);const j=await api('/api/community/comments?root='+encodeURIComponent(root)+(more&&old?.next?'&after='+old.next:''));threads.set(root,{items:more?[...old.items,...j.items]:j.items,next:j.next});renderComments()}
  if($('community')){
   $('vote-support').onclick=()=>vote(1,$('vote-support'));$('vote-oppose').onclick=()=>vote(-1,$('vote-oppose'));
@@ -53,6 +53,7 @@
   setInterval(()=>{if(!document.hidden){stats();supporters()}},30000);
   window.addEventListener('site:languagechange',()=>{voteMessage();renderComments()});
  }
+ window.CommunityClient={api,connect,notice,openDiscussion:async(root,title)=>{currentTopic={id:root,root_id:root,parent_id:null,depth:0,topic:true,body:title,status:'hidden'};roots=[currentTopic,...roots.filter(x=>x.id!==root&&!x.topic)];replyTo=root;$('reply-context').textContent='Replying to a comment';$('cancel-reply').hidden=false;await loadThread(root);$('comment-body').focus()}};
  // Optional analytics. No event is sent until the visitor opts in.
  let heartbeat=null;
  async function visit(pageview){if(store.get('ifa-analytics')!=='yes'||document.hidden)return;try{await api('/api/community/visit','POST',{consent:true,path:location.pathname,pageview})}catch{}}

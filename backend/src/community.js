@@ -14,11 +14,11 @@ async function session(req,env){
  const valid=await crypto.subtle.verify('HMAC',await key(env),signature,encoder.encode('community-v1:session:'+parts[0]+'.'+parts[1]));
  if(!valid)throw new Problem('Please reconnect to participate.',401);return parts[0];
 }
-async function body(req){
+async function body(req,maxBytes=8000){
  if(!(req.headers.get('Content-Type')||'').startsWith('application/json'))throw new Problem('JSON required.',415);
- if(Number(req.headers.get('Content-Length'))>8000)throw new Problem('Message too large.',413);
+ if(Number(req.headers.get('Content-Length'))>maxBytes)throw new Problem('Message too large.',413);
  const reader=req.body?.getReader();if(!reader)throw new Problem('Message required.');let chunks=[],size=0;
- while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>8000){await reader.cancel();throw new Problem('Message too large.',413)}chunks.push(value)}
+ while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>maxBytes){await reader.cancel();throw new Problem('Message too large.',413)}chunks.push(value)}
  const bytes=new Uint8Array(size);let offset=0;for(const c of chunks){bytes.set(c,offset);offset+=c.length}
  try{const x=JSON.parse(new TextDecoder().decode(bytes));if(!x||typeof x!=='object'||Array.isArray(x))throw Error();return x}catch{throw new Problem('Invalid message.')}
 }
@@ -73,14 +73,14 @@ export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.ca
   if(req.method==='GET'&&path==='/api/community/supporters')return await cached(req,ctx,cache,async()=>{const r=await env.DB.prepare('SELECT alias,city,choice,updated_at FROM community_votes WHERE is_public=1 ORDER BY updated_at DESC LIMIT 20').all();return json({items:r.results||[]})});
   if(req.method==='GET'&&path==='/api/community/comments')return await cached(req,ctx,cache,async()=>{
    const root=url.searchParams.get('root');
-   if(root){if(!uid.test(root))throw new Problem('Invalid thread.');const after=Number(url.searchParams.get('after'))||0;const r=await env.DB.prepare('SELECT rowid AS cursor,* FROM community_comments WHERE root_id=? AND rowid>? ORDER BY rowid LIMIT 51').bind(root,after).all();const rows=r.results||[];return json({items:rows.slice(0,50).map(publicComment),next:rows.length>50?rows[49].cursor:null})}
+   if(root){const topic=await env.DB.prepare('SELECT status FROM community_posts WHERE root_id=?').bind(root).first();if(topic&&topic.status!=='published')throw new Problem('Not found.',404);if(!uid.test(root))throw new Problem('Invalid thread.');const after=Number(url.searchParams.get('after'))||0;const r=await env.DB.prepare('SELECT rowid AS cursor,* FROM community_comments WHERE root_id=? AND rowid>? ORDER BY rowid LIMIT 51').bind(root,after).all();const rows=r.results||[];return json({items:rows.slice(0,50).map(publicComment),next:rows.length>50?rows[49].cursor:null})}
    const before=Number(url.searchParams.get('before'))||Number.MAX_SAFE_INTEGER;
-   const r=await env.DB.prepare('SELECT rowid AS cursor,* FROM community_comments WHERE parent_id IS NULL AND rowid<? ORDER BY rowid DESC LIMIT 11').bind(before).all();const rows=r.results||[];return json({items:rows.slice(0,10).map(publicComment),next:rows.length>10?rows[9].cursor:null});
+   const r=await env.DB.prepare('SELECT rowid AS cursor,* FROM community_comments WHERE parent_id IS NULL AND NOT EXISTS(SELECT 1 FROM community_posts p WHERE p.root_id=community_comments.id) AND rowid<? ORDER BY rowid DESC LIMIT 11').bind(before).all();const rows=r.results||[];return json({items:rows.slice(0,10).map(publicComment),next:rows.length>10?rows[9].cursor:null});
   });
   const id=await session(req,env);
   if(req.method==='GET'&&path==='/api/community/me'){
    const vote=await env.DB.prepare('SELECT choice,alias,city,is_public FROM community_votes WHERE session_id=?').bind(id).first();
-   const reactions=await env.DB.prepare("SELECT choice FROM community_reactions WHERE session_id=? AND target_id='campaign'").bind(id).first();const own=await env.DB.prepare('SELECT id FROM community_comments WHERE session_id=? ORDER BY created_at DESC LIMIT 100').bind(id).all();return json({vote,reaction:reactions?.choice||0,own_comments:own.results.map(x=>x.id)});
+   const reactions=await env.DB.prepare("SELECT choice FROM community_reactions WHERE session_id=? AND target_id='campaign'").bind(id).first();const own=await env.DB.prepare('SELECT id FROM community_comments WHERE session_id=? AND body<>\'\' ORDER BY created_at DESC LIMIT 100').bind(id).all();return json({vote,reaction:reactions?.choice||0,own_comments:own.results.map(x=>x.id)});
   }
   if(req.method!=='POST')throw new Problem('Not found.',404);
   const data=await body(req),stamp=now();
@@ -95,9 +95,9 @@ export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.ca
   if(path==='/api/community/comment'){
    if(data.public_consent!==true)throw new Problem('Please agree to publish your comment.');
    const alias=text(data.alias,50,true),city=text(data.city,80),content=text(data.body,1500,true),parent=data.parent_id||null;
-   let root='',depth=0;if(parent){if(!uid.test(parent))throw new Problem('Invalid reply.');const p=await env.DB.prepare('SELECT root_id,depth,status FROM community_comments WHERE id=?').bind(parent).first();if(!p||p.status!=='visible')throw new Problem('This comment cannot receive replies.');depth=p.depth+1;if(depth>5)throw new Problem('Reply depth limit reached.');root=p.root_id}
-   const recent=await env.DB.prepare('SELECT created_at FROM community_comments WHERE session_id=? ORDER BY created_at DESC LIMIT 1').bind(id).first();if(recent&&stamp-recent.created_at<15)throw new Problem('Please wait 15 seconds between comments.',429);
-   const commentId=crypto.randomUUID();const inserted=await env.DB.prepare('INSERT INTO community_comments(id,parent_id,root_id,depth,session_id,alias,city,body,created_at) SELECT ?,?,?,?,?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM community_comments WHERE session_id=? AND created_at>?)').bind(commentId,parent,root||commentId,depth,id,alias,city,content,stamp,id,stamp-15).run();if(inserted.meta?.changes!==1)throw new Problem('Please wait 15 seconds between comments.',429);return json({ok:true,id:commentId,root_id:root||commentId},201);
+   let root='',depth=0;if(parent){if(!uid.test(parent))throw new Problem('Invalid reply.');const p=await env.DB.prepare('SELECT root_id,depth,status FROM community_comments WHERE id=?').bind(parent).first();if(!p)throw new Problem('This comment cannot receive replies.');if(p.status!=='visible'){const topic=await env.DB.prepare("SELECT id FROM community_posts WHERE root_id=? AND status='published'").bind(parent).first();if(!topic)throw new Problem('This comment cannot receive replies.');}depth=p.depth+1;if(depth>5)throw new Problem('Reply depth limit reached.');root=p.root_id}
+   const recent=await env.DB.prepare('SELECT created_at FROM community_comments WHERE session_id=? AND body<>\'\' ORDER BY created_at DESC LIMIT 1').bind(id).first();if(recent&&stamp-recent.created_at<15)throw new Problem('Please wait 15 seconds between comments.',429);
+   const commentId=crypto.randomUUID();const inserted=await env.DB.prepare('INSERT INTO community_comments(id,parent_id,root_id,depth,session_id,alias,city,body,created_at) SELECT ?,?,?,?,?,?,?,?,? WHERE NOT EXISTS (SELECT 1 FROM community_comments WHERE session_id=? AND created_at>? AND body<>\'\')').bind(commentId,parent,root||commentId,depth,id,alias,city,content,stamp,id,stamp-15).run();if(inserted.meta?.changes!==1)throw new Problem('Please wait 15 seconds between comments.',429);return json({ok:true,id:commentId,root_id:root||commentId},201);
   }
   if(path==='/api/community/react'){
    const target=data.target_id;if(target!=='campaign'&&!uid.test(target||''))throw new Problem('Invalid reaction.');
@@ -121,7 +121,7 @@ export async function handleCommunity(req,env,ctx,authorized,cache=globalThis.ca
   if(path==='/api/community/visit'){
    if(data.consent!==true)throw new Problem('Analytics consent required.');
    const day=new Date().toISOString().slice(0,10),visitor=await digest(env,'visitor:'+day+':'+id);
-   const allowed=['/','/dashboard.html','/states.html','/methodology.html','/privacy.html'];const page=allowed.includes(data.path)?data.path:'/';
+   const allowed=['/','/dashboard.html','/states.html','/methodology.html','/privacy.html','/families.html'];const page=allowed.includes(data.path)?data.path:'/';
    const country=String(req.cf?.country||'Unknown').slice(0,60),region=String(req.cf?.region||'Unknown').slice(0,80);
    const device=/mobile|android|iphone/i.test(req.headers.get('User-Agent')||'')?'Mobile':'Desktop or tablet';const increment=data.pageview===true?1:0;
    await env.DB.batch([
@@ -145,7 +145,7 @@ async function admin(req,env,url){
   return json({today:total,active:active.count,recent:live.results,pages:pages.results,as_of:stamp,consent_only:true});
  }
  if(req.method==='GET'&&url.pathname==='/api/admin/community/comments'){
-  const r=await env.DB.prepare('SELECT c.id,c.alias,c.city,c.body,c.status,c.created_at,(SELECT COUNT(*) FROM community_reports r WHERE r.comment_id=c.id) AS reports FROM community_comments c ORDER BY reports DESC,c.created_at DESC LIMIT 100').all();return json({items:r.results});
+  const r=await env.DB.prepare('SELECT c.id,c.alias,c.city,c.body,c.status,c.created_at,(SELECT COUNT(*) FROM community_reports r WHERE r.comment_id=c.id) AS reports FROM community_comments c WHERE NOT EXISTS(SELECT 1 FROM community_posts p WHERE p.root_id=c.id) ORDER BY reports DESC,c.created_at DESC LIMIT 100').all();return json({items:r.results});
  }
  if(req.method==='POST'&&url.pathname==='/api/admin/community/moderate'){
   const data=await body(req);if(!uid.test(data.id||'')||!['visible','hidden'].includes(data.status))throw new Problem('Invalid moderation action.');
@@ -153,3 +153,5 @@ async function admin(req,env,url){
  }
  throw new Problem('Not found.',404);
 }
+
+export {session,body,rate,json,Problem,text};

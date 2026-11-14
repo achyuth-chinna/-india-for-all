@@ -1,3 +1,4 @@
+import {handlePosts} from './posts.js';
 import {handleCommunity,cleanupCommunity,guardAdmin,protectResearch,publicCacheKey} from './community.js';
 import { importDrafts } from './intake.js';
 import { adminHtml } from './admin-page.js';
@@ -37,9 +38,10 @@ export default {
  async fetch(req,env,ctx){
   const researchCached=await protectResearch(req,env);if(researchCached)return researchCached;
   const gate=await guardAdmin(req,env,authorized);if(gate)return gate;
+  const postResponse=await handlePosts(req,env,ctx,authorized);if(postResponse)return postResponse;
   const community=await handleCommunity(req,env,ctx,authorized);if(community)return community;
   const url=new URL(req.url),path=url.pathname;
-  if(req.method==='GET'&&path==='/admin'){const nonce=crypto.randomUUID().replaceAll('-','');return new Response(adminHtml.replace('<script>','<script nonce="'+nonce+'">'),{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff','x-frame-options':'DENY','referrer-policy':'no-referrer','content-security-policy':"default-src 'none'; script-src 'nonce-"+nonce+"'; style-src 'unsafe-inline'; connect-src 'self'; img-src 'none'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"}})}
+  if(req.method==='GET'&&path==='/admin'){const nonce=crypto.randomUUID().replaceAll('-','');return new Response(adminHtml.replace('<script>','<script nonce="'+nonce+'">'),{headers:{'content-type':'text/html; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff','x-frame-options':'DENY','referrer-policy':'no-referrer','content-security-policy':"default-src 'none'; script-src 'nonce-"+nonce+"'; style-src 'unsafe-inline'; connect-src 'self'; img-src blob:; media-src blob:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"}})}
   if(!path.startsWith('/api/'))return fail('Not found',404);
   if(!env.DB)return fail('Database not configured',503);
   try{

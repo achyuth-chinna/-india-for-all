@@ -1,0 +1,1 @@
+document.getElementById('pause-tree')?.addEventListener('click',event=>{const paused=document.getElementById('future-tree').classList.toggle('pause-tree');event.currentTarget.setAttribute('aria-pressed',String(paused));event.currentTarget.textContent=paused?'Resume animation':'Pause animation'});

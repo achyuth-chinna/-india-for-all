@@ -2,7 +2,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {handleCommunity,cleanupCommunity,guardAdmin,publicCacheKey} from '../src/community.js';
-const db=new DatabaseSync(':memory:');db.exec(readFileSync(new URL('../schema-community.sql',import.meta.url),'utf8'));
+const db=new DatabaseSync(':memory:');db.exec(readFileSync(new URL('../schema-community.sql',import.meta.url),'utf8'));db.exec(readFileSync(new URL('../schema-posts.sql',import.meta.url),'utf8'));
 function statement(sql,args=[]){return {bind(...values){return statement(sql,values)},async run(){const r=db.prepare(sql).run(...args);return {meta:{changes:Number(r.changes)}}},async all(){return {results:db.prepare(sql).all(...args)}},async first(){return db.prepare(sql).get(...args)||null},sql,args}}
 const DB={prepare:statement,async batch(items){db.exec('BEGIN');try{const result=items.map(x=>({meta:{changes:Number(db.prepare(x.sql).run(...x.args).changes)}}));db.exec('COMMIT');return result}catch(e){db.exec('ROLLBACK');throw e}}};
 const env={DB,ADMIN_TOKEN:'test-only-admin-secret-not-a-real-credential',COMMUNITY_LIMITER:{limit:async()=>({success:true})},SESSION_LIMITER:{limit:async()=>({success:true})},READ_LIMITER:{limit:async()=>({success:true})}};

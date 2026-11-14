@@ -1,0 +1,30 @@
+import {DatabaseSync} from 'node:sqlite';import {readFileSync}from'node:fs';import assert from'node:assert/strict';
+import {handlePosts}from'../src/posts.js';import{handleCommunity}from'../src/community.js';
+const db=new DatabaseSync(':memory:');db.exec(readFileSync(new URL('../schema-community.sql',import.meta.url),'utf8'));db.exec(readFileSync(new URL('../schema-posts.sql',import.meta.url),'utf8'));
+function stmt(sql,args=[]){return{sql,args,bind(...a){return stmt(sql,a)},async run(){return{meta:{changes:Number(db.prepare(sql).run(...args).changes)}}},async first(){return db.prepare(sql).get(...args)||null},async all(){return{results:db.prepare(sql).all(...args)}}}}
+const DB={prepare:stmt,async batch(items){db.exec('BEGIN');try{const r=items.map(x=>({meta:{changes:Number(db.prepare(x.sql).run(...x.args).changes)}}));db.exec('COMMIT');return r}catch(e){db.exec('ROLLBACK');throw e}}};const env={DB,ADMIN_TOKEN:'test-only-secret',...Object.fromEntries(['COMMUNITY_LIMITER','SESSION_LIMITER','READ_LIMITER'].map(k=>[k,{limit:async()=>({success:true})}]))};const auth=r=>r.headers.get('Authorization')==='Bearer test-only-secret';
+async function call(path,method='GET',data,token,admin=false){const headers={Origin:'https://india-for-all.katojuachyuth.workers.dev','Content-Type':'application/json'};if(token)headers['X-Community-Session']=token;if(admin)headers.Authorization='Bearer test-only-secret';const req=new Request('https://api.example'+path,{method,headers,body:data?JSON.stringify(data):undefined});const r=await handlePosts(req,env,{},auth)||await handleCommunity(req,env,{},auth,null);return{status:r.status,data:await r.json()}}
+const token=(await call('/api/community/session','POST',{})).data.token;
+const post={alias:'Test',city:'Test city',title:'Test issue',body:'<script>test only</script>',kind:'photo',media_url:'https://example.org/photo.jpg',consent:true};
+assert.equal((await call('/api/community/posts','POST',{...post,consent:false},token)).status,400);
+assert.equal((await call('/api/community/posts','POST',{...post,media_url:'https://127.0.0.1/file'},token)).status,400);
+assert.equal((await call('/api/community/posts','POST',{...post,media_url:'javascript:alert(1)'},token)).status,400);
+assert.equal((await call('/api/community/uploads')).data.enabled,false);
+assert.equal((await call('/api/community/uploads','POST',{},token)).status,503);
+const result=await call('/api/community/posts','POST',post,token);assert.equal(result.status,201);const id=result.data.id;
+assert.equal((await call('/api/community/posts')).data.items.length,0);
+assert.equal((await call('/api/community/comments')).data.items.length,0);
+assert.equal((await call('/api/admin/community/posts')).status,401);
+const admin=(await call('/api/admin/community/posts','GET',undefined,undefined,true)).data.items[0];assert(!('session_id'in admin));
+assert.equal((await call('/api/community/comments?root='+admin.root_id)).status,404);
+await call('/api/admin/community/post-action','POST',{id,action:'publish'},undefined,true);
+assert.equal((await call('/api/community/posts')).data.items[0].body,'<script>test only</script>');
+const reply=(await call('/api/community/comment','POST',{alias:'Reply',body:'Test reply',parent_id:admin.root_id,public_consent:true},token));assert.equal(reply.status,201);
+assert.equal((await call('/api/community/comments')).data.items.length,0);
+assert.equal((await call('/api/community/comments?root='+admin.root_id)).data.items.length,2);
+await call('/api/admin/community/comment-delete','POST',{id:reply.data.id},undefined,true);assert.equal(db.prepare('SELECT body FROM community_comments WHERE id=?').get(reply.data.id).body,'');
+await call('/api/admin/community/post-action','POST',{id,action:'delete'},undefined,true);assert.equal((await call('/api/community/posts')).data.items.length,0);assert.equal(db.prepare('SELECT body FROM community_posts WHERE id=?').get(id).body,'');
+assert.equal((await call('/api/community/comments?root='+admin.root_id)).status,404);
+const count=db.prepare('SELECT COUNT(*) AS n FROM community_comments').get().n;
+assert.equal((await call('/api/community/posts','POST',post,token)).status,429);assert.equal(db.prepare('SELECT COUNT(*) AS n FROM community_comments').get().n,count);
+console.log('Passed post consent, HTTPS/private-host checks, disabled-upload behavior, pending visibility, admin authorization, publication, nested replies, thread erasure, post erasure, privacy, cooldown and orphan prevention.');

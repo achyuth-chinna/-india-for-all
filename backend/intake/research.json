@@ -1,3 +1,43 @@
 {
-  "items": []
+  "items": [
+    {
+      "title": "Telangana out-of-pocket share of health expenditure, 2021–22",
+      "summary": "A Ministry of Health parliamentary reply reports that out-of-pocket spending represented 37.6% of Telangana's total health expenditure in 2021–22. This is a historical state spending share, not a household bill or a current-year estimate.",
+      "category": "healthcare",
+      "region": "Telangana",
+      "source_name": "Ministry of Health and Family Welfare / PIB",
+      "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2084188",
+      "source_published_on": "2024-12-13",
+      "reporting_period": "2021–22",
+      "metric_value": "37.6",
+      "metric_unit": "% of state total health expenditure",
+      "evidence_note": "Historical baseline added during initial intake, not newly released today. Annexure, row 20 Telangana, column 2021–22. Original official release checked 14 Nov 2026. Editor should cross-check underlying NHA state table and look for newer estimates; no causal claim."
+    },
+    {
+      "title": "Andhra Pradesh out-of-pocket share of health expenditure, 2021–22",
+      "summary": "A Ministry of Health parliamentary reply reports that out-of-pocket spending represented 52.0% of Andhra Pradesh's total health expenditure in 2021–22. This historical share does not measure the price of individual treatments.",
+      "category": "healthcare",
+      "region": "Andhra Pradesh",
+      "source_name": "Ministry of Health and Family Welfare / PIB",
+      "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2084188",
+      "source_published_on": "2024-12-13",
+      "reporting_period": "2021–22",
+      "metric_value": "52.0",
+      "metric_unit": "% of state total health expenditure",
+      "evidence_note": "Historical baseline, not news today. Annexure row 2 Andhra Pradesh, column 2021–22. Original official release checked 14 Nov 2026. Editor should verify NHA definitions and latest available state estimates before publication."
+    },
+    {
+      "title": "Government health spending ratio depends on GDP series, 2022–23",
+      "summary": "The May 2026 NHA release reports government health expenditure at 1.43% of GDP in 2022–23 and separately gives 1.48% using the new GDP series with base year 2022–23. The denominator series must be identified when quoting either estimate.",
+      "category": "public_spending",
+      "region": "India",
+      "source_name": "Ministry of Health and Family Welfare / PIB",
+      "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2265816",
+      "source_published_on": "2026-05-27",
+      "reporting_period": "2022–23",
+      "metric_value": "1.48",
+      "metric_unit": "% of GDP (2022–23 base-year series)",
+      "evidence_note": "Definition clarification, not a newly released figure today. First expenditure paragraph of official release checked 14 Nov 2026 explicitly distinguishes 1.43% from 1.48% under new GDP series. Editor should reconcile full NHA report before changing the dashboard's existing 1.43% card; no universal-service cost inference."
+    }
+  ]
 }

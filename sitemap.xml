@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url><loc>https://wevotefor.in/</loc></url>
-<url><loc>https://wevotefor.in/dashboard.html</loc></url>
-<url><loc>https://wevotefor.in/states.html</loc></url>
-<url><loc>https://wevotefor.in/methodology.html</loc></url>
-<url><loc>https://wevotefor.in/families.html</loc></url><url><loc>https://wevotefor.in/privacy.html</loc></url></urlset>
+<url><loc>https://wevotefor.in/dashboard</loc></url>
+<url><loc>https://wevotefor.in/states</loc></url>
+<url><loc>https://wevotefor.in/methodology</loc></url>
+<url><loc>https://wevotefor.in/families</loc></url>
+<url><loc>https://wevotefor.in/privacy</loc></url>
+</urlset>

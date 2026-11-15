@@ -3,3 +3,7 @@
 #issue-list img,#issue-list video{display:block;max-height:460px;margin:16px 0;border-radius:12px}#issue-list p{white-space:pre-wrap;line-height:1.8}#public-posts{scroll-margin-top:90px}
 
 .navlinks{gap:12px;flex-wrap:wrap;justify-content:center}.navlinks a{font-size:12px}
+
+
+/* Public campaign message; shares open only after a visitor chooses a link. */
+.campaign-manifesto{background:#eaf4ef;scroll-margin-top:100px}.campaign-manifesto .wrap{max-width:1080px}.campaign-manifesto blockquote{margin:26px 0;padding:20px 24px;border-left:5px solid #099e91;background:white;border-radius:0 16px 16px 0;font-size:clamp(20px,2.6vw,30px);line-height:1.5;font-weight:700}.campaign-manifesto p{line-height:1.8;max-width:960px}.campaign-manifesto .campaign-promise{font-weight:800;color:#086b65;font-size:20px}.campaign-manifesto .btn.secondary{border-color:#53766d;color:#173b32}.campaign-manifesto .actions{display:flex;flex-wrap:wrap;gap:14px}.campaign-manifesto .community-small{color:#425f56}@media(max-width:600px){.campaign-manifesto blockquote{padding:18px}.campaign-manifesto .actions a{width:100%;box-sizing:border-box;text-align:center}}

@@ -45,6 +45,16 @@ export default {
   if(!path.startsWith('/api/'))return fail('Not found',404);
   if(!env.DB)return fail('Database not configured',503);
   try{
+   if(req.method==='GET'&&path==='/api/research/latest'){
+    const upstream=await fetch('https://raw.githubusercontent.com/achyuth-chinna/-india-for-all/main/backend/intake/research.json',{cf:{cacheTtl:300}});
+    if(!upstream.ok)return fail('Research updates temporarily unavailable',503);
+    const raw=await upstream.text();if(raw.length>250000)return fail('Research feed too large',503);
+    const data=JSON.parse(raw);if(!Array.isArray(data.items)||data.items.length>50)return fail('Invalid research feed',503);
+    const items=data.items.filter(item=>!validate(item)).map(item=>({title:item.title,summary:item.summary,category:item.category,region:item.region,source_name:item.source_name,source_url:item.source_url,source_published_on:item.source_published_on||null,reporting_period:item.reporting_period,metric_value:item.metric_value||null,metric_unit:item.metric_unit||null,verification:'source-linked candidate; editorial verification not confirmed'}));
+    const response=reply({items,count:items.length,feed_type:'source-linked research candidates, not editorially approved',updated_at:new Date().toISOString()});
+    const origin=req.headers.get('Origin');if(['https://wevotefor.in','https://india-for-all.katojuachyuth.workers.dev'].includes(origin))response.headers.set('Access-Control-Allow-Origin',origin);
+    response.headers.set('Vary','Origin');response.headers.set('Cache-Control','public, max-age=300, s-maxage=300');return response;
+   }
    if(req.method==='GET'&&path==='/api/health')return reply({ok:true,service:'india-for-all-research'});
    if(req.method==='GET'&&path==='/api/research'){
     const limit=Math.min(50,Math.max(1,Math.floor(Number(url.searchParams.get('limit')))||20));

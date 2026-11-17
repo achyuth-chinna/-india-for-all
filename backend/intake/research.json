@@ -64,6 +64,19 @@
       "metric_value": "2863",
       "metric_unit": "₹ average household spending per student in government schools (non-government: ₹25,002)",
       "evidence_note": "MoSPI CMS Education 2025 press note dated 26 August 2025, page 2, section 'Significantly low per-student expenditure in Government schools'. Sample: 52,085 households and 57,742 students (page 1). Estimates refer to household spending during the current academic year for enrolled school students, not college expenses, school operating costs or causal impacts. Page 5 cautions that CMS Education is not directly comparable with NSS 75th Round and state estimates require sample-size/RSE checks. Human reviewer should consult full report, expenditure components and uncertainty before publication."
+    },
+    {
+      "title": "India out-of-pocket share of total health spending fell to 42.7% in 2023–24",
+      "summary": "National Health Accounts 2023–24 estimates put household out-of-pocket expenditure at 42.7% of India's total health expenditure, down from 43.4% in 2022–23 and 64.2% in 2013–14. This is a share of national spending, not the percentage of households facing medical bills or evidence that treatment is affordable for everyone.",
+      "category": "healthcare",
+      "region": "India",
+      "source_name": "Ministry of Health and Family Welfare / Press Information Bureau",
+      "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2336478",
+      "source_published_on": "2026-11-15",
+      "reporting_period": "2023–24 (comparisons: 2022–23 and 2013–14)",
+      "metric_value": "42.7",
+      "metric_unit": "% of total health expenditure",
+      "evidence_note": "PIB release dated 15 November 2026, section 'Households' Out-of-Pocket Expenditure (OOPE) Falls by 21.5 Percentage Points' (paragraphs immediately below heading): 64.2% in 2013–14, 43.4% in 2022–23, 42.7% in 2023–24. NHA uses System of Health Accounts 2011 framework. These are national expenditure shares, not household incidence or financial hardship rates. Human reviewer must verify underlying NHSRC NHA 2023–24 report tables, revisions and comparability before publication; no causal attribution to particular schemes."
     }
   ]
 }

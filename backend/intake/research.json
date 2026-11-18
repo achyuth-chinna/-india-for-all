@@ -77,6 +77,19 @@
       "metric_value": "42.7",
       "metric_unit": "% of total health expenditure",
       "evidence_note": "PIB release dated 15 November 2026, section 'Households' Out-of-Pocket Expenditure (OOPE) Falls by 21.5 Percentage Points' (paragraphs immediately below heading): 64.2% in 2013–14, 43.4% in 2022–23, 42.7% in 2023–24. NHA uses System of Health Accounts 2011 framework. These are national expenditure shares, not household incidence or financial hardship rates. Human reviewer must verify underlying NHSRC NHA 2023–24 report tables, revisions and comparability before publication; no causal attribution to particular schemes."
+    },
+    {
+      "title": "PM-JAY Union budget estimate rises to ₹9,500 crore for 2026–27",
+      "summary": "A Government of India budget explainer lists ₹9,500 crore as the 2026–27 Budget Estimate for Pradhan Mantri Jan Arogya Yojana (PM-JAY), versus ₹9,000 crore in the 2025–26 Revised Estimate, a ₹500 crore (5.56%) increase. These are allocations, not actual expenditure, claims paid, or evidence of improved treatment access.",
+      "category": "public_spending",
+      "region": "India",
+      "source_name": "Press Information Bureau, Government of India",
+      "source_url": "https://www.pib.gov.in/PressNoteDetails.aspx?ModuleId=3&NoteId=157968&id=157968&lang=2&reg=48",
+      "source_published_on": "2026-03-30",
+      "reporting_period": "2026–27 Budget Estimate compared with 2025–26 Revised Estimate",
+      "metric_value": "9500",
+      "metric_unit": "₹ crore, 2026–27 Budget Estimate",
+      "evidence_note": "PIB explainer posted 30 March 2026, 'Many health initiatives were allocated more funds this year' table, PM-JAY row: 2026–27 BE ₹9,500.00 crore; 2025–26 RE ₹9,000.00 crore; increase ₹500.00 crore (5.56%). Older budget publication newly added to intake on 18 November 2026, not newly published today. Human reviewer must cross-check Union Expenditure Budget Demand for Grants and later actual expenditure, distinguish central allocations from spending and scheme outcomes. No causal or savings claim."
     }
   ]
 }

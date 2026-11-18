@@ -1,0 +1,10 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {publishApproved,sameResearch} from '../src/publication.js';
+const item={title:'Checked title',summary:'Summary',category:'education',region:'India',source_name:'Official source',source_url:'https://example.gov.in/report',reporting_period:'2025',evidence_note:'Limitations'};
+const entry={item,review_note:'Checked source table',reviewed_by:'automated-source-review',reviewed_at:'2026-11-18'};
+function fixture(entries,rows){let writes=0;const statements=[];return {statements,get writes(){return writes},DB:{prepare(sql){const statement={sql,bind(...args){this.args=args;return this},async all(){return {results:rows}}};statements.push(statement);return statement},async batch(batch){writes++;assert.match(batch[0].sql,/status IN \('draft','in_review'\)/);assert.match(batch[0].sql,/COALESCE\(summary,''\)=\?/);assert.match(batch[1].sql,/WHERE changes\(\)=1/);return [{meta:{changes:1}},{}]}},fetcher:async()=>new Response(JSON.stringify({items:entries}))};}
+test('changed content or caveats cannot inherit approval',async()=>{assert.equal(sameResearch(item,{...item,evidence_note:'Changed'}),false);const f=fixture([entry],[{...item,id:'1',summary:'Edited'}]);assert.equal((await publishApproved(f,()=>null,f.fetcher)).skipped,1);assert.equal(f.writes,0)});
+test('exact reviewed snapshot publishes with audit and conditional update',async()=>{const f=fixture([entry],[{...item,id:'1'}]);assert.equal((await publishApproved(f,()=>null,f.fetcher)).published,1);assert.equal(f.writes,1);assert.match(f.statements[0].sql,/status IN \('draft','in_review'\)/)});
+test('invalid batch fails before writes',async()=>{const f=fixture([entry,{...entry,review_note:''}],[item]);await assert.rejects(()=>publishApproved(f,()=>null,f.fetcher),/Invalid approval evidence/);assert.equal(f.statements.length,0)});
+test('missing manifest fails closed',async()=>{const f=fixture([],[]);await assert.rejects(()=>publishApproved(f,()=>null,async()=>new Response('',{status:404})),/unavailable/);assert.equal(f.writes,0)});

@@ -1,6 +1,7 @@
 import {handlePosts} from './posts.js';
 import {handleCommunity,cleanupCommunity,guardAdmin,protectResearch,publicCacheKey} from './community.js';
 import { importDrafts } from './intake.js';
+import { publishApproved } from './publication.js';
 import { adminHtml } from './admin-page.js';
 // Cloudflare Worker API backed by D1. Review required before publication.
 const JSON_HEADERS = {'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff'};
@@ -34,7 +35,7 @@ async function audit(db,id,action,actor,note=''){
  await db.prepare('INSERT INTO review_events(item_id,action,actor,note) VALUES(?,?,?,?)').bind(id,action,actor,note).run();
 }
 export default {
- async scheduled(event,env,ctx){ ctx.waitUntil(importDrafts(env,validate).then(result=>console.log('Research intake',JSON.stringify(result))));ctx.waitUntil(cleanupCommunity(env)); },
+ async scheduled(event,env,ctx){ ctx.waitUntil(importDrafts(env,validate).then(async intake=>({intake,publication:await publishApproved(env,validate)})).then(result=>console.log('Research intake',JSON.stringify(result))));ctx.waitUntil(cleanupCommunity(env)); },
  async fetch(req,env,ctx){
   const researchCached=await protectResearch(req,env);if(researchCached)return researchCached;
   const gate=await guardAdmin(req,env,authorized);if(gate)return gate;

@@ -21,3 +21,19 @@ Admin routes require Bearer authorization: GET/POST `/api/admin/research`, POST 
 ## Operations
 
 Git pushes to main trigger automatic builds for both Workers. The backend root is `backend`; keep the static site's configuration separate. D1 binding DB points to india-for-all-research. ADMIN_TOKEN remains a Cloudflare secret. Intake logs report candidates/imported counts without payloads or credentials. Check scheduled invocation logs for failures; never claim ingestion succeeded from a Git commit alone. No automatic publication is permitted.
+
+## Automatic reviewed publication
+
+The hourly Worker cron imports candidates, then applies `backend/intake/approved.json`.
+Each approval holds the entire reviewed item snapshot, source-check note, review date,
+and `automated-source-review` attribution. Only exact matching draft/in-review records
+are published; rejected records and changed content are never automatically approved.
+Publication and its review event use a D1 batch. ADMIN_TOKEN is neither required nor
+stored in the public manifest. This is automated source review, not a claim of human
+or independent professional review.
+
+The research automation must check original sources and all seven translations before
+committing an approval. Unverifiable candidates stay unapproved. New approved snapshots
+are picked up on the next hourly cron without deploying the website again. The Worker
+must first be deployed with `publication.js`. Publication is confirmed only when the
+public `/api/research` endpoint returns the records; a GitHub commit alone is insufficient.

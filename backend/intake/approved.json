@@ -1,0 +1,112 @@
+{
+  "items": [
+    {
+      "item": {
+        "title": "Telangana out-of-pocket share of health expenditure, 2021–22",
+        "summary": "A Ministry of Health parliamentary reply reports that out-of-pocket spending represented 37.6% of Telangana's total health expenditure in 2021–22. This is a historical state spending share, not a household bill or a current-year estimate.",
+        "category": "healthcare",
+        "region": "Telangana",
+        "source_name": "Ministry of Health and Family Welfare / PIB",
+        "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2084188",
+        "source_published_on": "2024-12-13",
+        "reporting_period": "2021–22",
+        "metric_value": "37.6",
+        "metric_unit": "% of state total health expenditure",
+        "evidence_note": "Historical baseline added during initial intake, not newly released today. Annexure, row 20 Telangana, column 2021–22. Original official release checked 14 Nov 2026. Editor should cross-check underlying NHA state table and look for newer estimates; no causal claim."
+      },
+      "reviewed_at": "2026-11-18",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Verified official PIB release 2084188, annexure row 20, 2021–22 column. Historical expenditure share; not a household bill."
+    },
+    {
+      "item": {
+        "title": "Andhra Pradesh out-of-pocket share of health expenditure, 2021–22",
+        "summary": "A Ministry of Health parliamentary reply reports that out-of-pocket spending represented 52.0% of Andhra Pradesh's total health expenditure in 2021–22. This historical share does not measure the price of individual treatments.",
+        "category": "healthcare",
+        "region": "Andhra Pradesh",
+        "source_name": "Ministry of Health and Family Welfare / PIB",
+        "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2084188",
+        "source_published_on": "2024-12-13",
+        "reporting_period": "2021–22",
+        "metric_value": "52.0",
+        "metric_unit": "% of state total health expenditure",
+        "evidence_note": "Historical baseline, not news today. Annexure row 2 Andhra Pradesh, column 2021–22. Original official release checked 14 Nov 2026. Editor should verify NHA definitions and latest available state estimates before publication."
+      },
+      "reviewed_at": "2026-11-18",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Verified official PIB release 2084188, annexure row 2, 2021–22 column. Historical expenditure share; not treatment prices."
+    },
+    {
+      "item": {
+        "title": "Government health spending ratio depends on GDP series, 2022–23",
+        "summary": "The May 2026 NHA release reports government health expenditure at 1.43% of GDP in 2022–23 and separately gives 1.48% using the new GDP series with base year 2022–23. The denominator series must be identified when quoting either estimate.",
+        "category": "public_spending",
+        "region": "India",
+        "source_name": "Ministry of Health and Family Welfare / PIB",
+        "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2265816",
+        "source_published_on": "2026-05-27",
+        "reporting_period": "2022–23",
+        "metric_value": "1.48",
+        "metric_unit": "% of GDP (2022–23 base-year series)",
+        "evidence_note": "Definition clarification, not a newly released figure today. First expenditure paragraph of official release checked 14 Nov 2026 explicitly distinguishes 1.43% from 1.48% under new GDP series. Editor should reconcile full NHA report before changing the dashboard's existing 1.43% card; no universal-service cost inference."
+      },
+      "reviewed_at": "2026-11-18",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Verified official PIB release 2265816, expenditure paragraph explicitly distinguishes 1.43% and 1.48% using different GDP series. No universal-service cost inference."
+    },
+    {
+      "item": {
+        "title": "India secondary-stage school dropout rate, 2025–26",
+        "summary": "UDISE+ reports a 7.0% dropout rate at the secondary stage (classes IX–XII) in 2025–26, compared with 8.2% in 2024–25. These are national stage-specific administrative estimates, not the share of all children out of school.",
+        "category": "education",
+        "region": "India",
+        "source_name": "Ministry of Education / Press Information Bureau",
+        "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2294035",
+        "source_published_on": "2026-08-03",
+        "reporting_period": "2025–26 (compared with 2024–25)",
+        "metric_value": "7.0",
+        "metric_unit": "% secondary-stage dropout rate",
+        "evidence_note": "Ministry of Education Lok Sabha written reply, table under 'Measures to Expand Access to Education', published 3 Aug 2026. Secondary stage defined as classes IX–XII; table gives 8.2 for 2024–25 and 7.0 for 2025–26. Not newly published on 15 Nov 2026. Editor should cross-check UDISE+ 2025–26 definitions, collection methodology and comparability before publication; not an out-of-school-child rate or causal evidence."
+      },
+      "reviewed_at": "2026-11-18",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Verified official PIB release 2294035, dropout table: secondary classes IX–XII, 8.2% and 7.0%. Not an out-of-school-child rate or causal evidence."
+    },
+    {
+      "item": {
+        "title": "India out-of-pocket share of total health spending fell to 42.7% in 2023–24",
+        "summary": "National Health Accounts 2023–24 estimates put household out-of-pocket expenditure at 42.7% of India's total health expenditure, down from 43.4% in 2022–23 and 64.2% in 2013–14. This is a share of national spending, not the percentage of households facing medical bills or evidence that treatment is affordable for everyone.",
+        "category": "healthcare",
+        "region": "India",
+        "source_name": "Ministry of Health and Family Welfare / Press Information Bureau",
+        "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2336478",
+        "source_published_on": "2026-11-15",
+        "reporting_period": "2023–24 (comparisons: 2022–23 and 2013–14)",
+        "metric_value": "42.7",
+        "metric_unit": "% of total health expenditure",
+        "evidence_note": "PIB release dated 15 November 2026, section 'Households' Out-of-Pocket Expenditure (OOPE) Falls by 21.5 Percentage Points' (paragraphs immediately below heading): 64.2% in 2013–14, 43.4% in 2022–23, 42.7% in 2023–24. NHA uses System of Health Accounts 2011 framework. These are national expenditure shares, not household incidence or financial hardship rates. Human reviewer must verify underlying NHSRC NHA 2023–24 report tables, revisions and comparability before publication; no causal attribution to particular schemes."
+      },
+      "reviewed_at": "2026-11-18",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Verified official PIB release 2336478, OOPE section: 64.2%, 43.4%, 42.7% for the stated years. National expenditure shares, not household incidence or proof of universal affordability."
+    },
+    {
+      "item": {
+        "title": "PM-JAY Union budget estimate rises to ₹9,500 crore for 2026–27",
+        "summary": "A Government of India budget explainer lists ₹9,500 crore as the 2026–27 Budget Estimate for Pradhan Mantri Jan Arogya Yojana (PM-JAY), versus ₹9,000 crore in the 2025–26 Revised Estimate, a ₹500 crore (5.56%) increase. These are allocations, not actual expenditure, claims paid, or evidence of improved treatment access.",
+        "category": "public_spending",
+        "region": "India",
+        "source_name": "Press Information Bureau, Government of India",
+        "source_url": "https://www.pib.gov.in/PressNoteDetails.aspx?ModuleId=3&NoteId=157968&id=157968&lang=2&reg=48",
+        "source_published_on": "2026-03-30",
+        "reporting_period": "2026–27 Budget Estimate compared with 2025–26 Revised Estimate",
+        "metric_value": "9500",
+        "metric_unit": "₹ crore, 2026–27 Budget Estimate",
+        "evidence_note": "PIB explainer posted 30 March 2026, 'Many health initiatives were allocated more funds this year' table, PM-JAY row: 2026–27 BE ₹9,500.00 crore; 2025–26 RE ₹9,000.00 crore; increase ₹500.00 crore (5.56%). Older budget publication newly added to intake on 18 November 2026, not newly published today. Human reviewer must cross-check Union Expenditure Budget Demand for Grants and later actual expenditure, distinguish central allocations from spending and scheme outcomes. No causal or savings claim."
+      },
+      "reviewed_at": "2026-11-18",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Verified official PIB explainer 157968, PM-JAY budget table: 9500 BE, 9000 RE, 500 increase and 5.56%. Allocations are not actual spending or outcomes."
+    }
+  ]
+}

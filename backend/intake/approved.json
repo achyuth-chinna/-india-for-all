@@ -107,6 +107,24 @@
       "reviewed_at": "2026-11-18",
       "reviewed_by": "automated-source-review",
       "review_note": "Verified official PIB explainer 157968, PM-JAY budget table: 9500 BE, 9000 RE, 500 increase and 5.56%. Allocations are not actual spending or outcomes."
+    },
+    {
+      "item": {
+        "title": "Household school spending in government and non-government schools, 2025",
+        "summary": "MoSPI's April–June 2025 education survey estimated average household spending per enrolled student in the current academic year at ₹2,863 in government schools and ₹25,002 in non-government schools. These are spending estimates, not tuition fees alone or the cost of providing education.",
+        "category": "education",
+        "region": "India",
+        "source_name": "Ministry of Statistics and Programme Implementation",
+        "source_url": "https://mospi.gov.in/sites/default/files/press_release/25082025_press%20release_CMS_E-Final_N.pdf",
+        "source_published_on": "2025-08-26",
+        "reporting_period": "April–June 2025 survey; current academic year",
+        "metric_value": "2863",
+        "metric_unit": "₹ average household spending per student in government schools (non-government: ₹25,002)",
+        "evidence_note": "MoSPI CMS Education 2025 press note dated 26 August 2025, page 2, section 'Significantly low per-student expenditure in Government schools'. Sample: 52,085 households and 57,742 students (page 1). Estimates refer to household spending during the current academic year for enrolled school students, not college expenses, school operating costs or causal impacts. Page 5 cautions that CMS Education is not directly comparable with NSS 75th Round and state estimates require sample-size/RSE checks. Human reviewer should consult full report, expenditure components and uncertainty before publication."
+      },
+      "reviewed_at": "2026-11-20",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Verified original MoSPI CMS Education 2025 press note (26 August 2025), PDF page 1 sample 52,085 households/57,742 students; page 2 'Significantly low per-student expenditure' gives ₹2,863 government and ₹25,002 non-government per enrolled school student during current academic year. Page 5 cautions subnational sample/RSE and non-comparability with NSS 75th Round; private coaching treated separately. Household expenditure, not tuition alone, public school operating cost, or a causal comparison. Seven language dictionaries checked for exact English title, summary and publisher keys before approval."
     }
   ]
 }

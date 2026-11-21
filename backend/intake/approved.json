@@ -125,6 +125,23 @@
       "reviewed_at": "2026-11-20",
       "reviewed_by": "automated-source-review",
       "review_note": "Verified original MoSPI CMS Education 2025 press note (26 August 2025), PDF page 1 sample 52,085 households/57,742 students; page 2 'Significantly low per-student expenditure' gives ₹2,863 government and ₹25,002 non-government per enrolled school student during current academic year. Page 5 cautions subnational sample/RSE and non-comparability with NSS 75th Round; private coaching treated separately. Household expenditure, not tuition alone, public school operating cost, or a causal comparison. Seven language dictionaries checked for exact English title, summary and publisher keys before approval."
+    },
+    {
+      "item": {
+        "title": "CAG reports 18.73% decline in Union social-services expenditure in 2024–25",
+        "summary": "CAG Report No. 6 of 2026 records Union social-services expenditure of ₹2,28,403 crore in 2024–25, compared with ₹2,81,039 crore in 2023–24, a decline of 18.73%. This Union accounting category includes education and health but is not total combined Centre-and-state social spending. The decline is not evidence of fraud, waste or a reduction in service quality.",
+        "category": "public_spending",
+        "region": "India",
+        "source_name": "Comptroller and Auditor General of India",
+        "source_url": "https://cag.gov.in/uploads/download_audit_report/2026/6of2026UGEng-069ce496f1158e0.22682438.pdf",
+        "reporting_period": "FY 2024–25 compared with FY 2023–24",
+        "metric_value": "-18.73",
+        "metric_unit": "% year-on-year change in Union social-services expenditure",
+        "evidence_note": "CAG Report No. 6 of 2026, Chapter 2, section 2.7.2, Figure 2.17, printed page 16: Social Services subtotal ₹2,81,039 crore in 2023–24 and ₹2,28,403 crore in 2024–25; YoY -18.73%. Sector includes education, health, housing and other social services; note excludes loans to states/UTs and other specified recipients. Historical FY 2024–25 accounts, not a November 2026 spending update. Verify underlying Union Government Finance Accounts and classification/reclassifications before comparative policy claims. Does not establish misuse, avoidable mortality, or outcomes."
+      },
+      "reviewed_at": "2026-11-21",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Checked original CAG Report No. 6 of 2026, Chapter 2 section 2.7.2, Figure 2.17, printed p.16: Union Social Services subtotals ₹2,81,039 crore (2023–24) and ₹2,28,403 crore (2024–25), year-on-year -18.73%. Includes education/health among other functions; excludes specified loans; not combined Centre/state spending, fraud or service-outcome evidence. All seven translation dictionaries committed first."
     }
   ]
 }

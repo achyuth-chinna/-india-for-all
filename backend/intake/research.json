@@ -90,6 +90,18 @@
       "metric_value": "9500",
       "metric_unit": "₹ crore, 2026–27 Budget Estimate",
       "evidence_note": "PIB explainer posted 30 March 2026, 'Many health initiatives were allocated more funds this year' table, PM-JAY row: 2026–27 BE ₹9,500.00 crore; 2025–26 RE ₹9,000.00 crore; increase ₹500.00 crore (5.56%). Older budget publication newly added to intake on 18 November 2026, not newly published today. Human reviewer must cross-check Union Expenditure Budget Demand for Grants and later actual expenditure, distinguish central allocations from spending and scheme outcomes. No causal or savings claim."
+    },
+    {
+      "title": "CAG reports 18.73% decline in Union social-services expenditure in 2024–25",
+      "summary": "CAG Report No. 6 of 2026 records Union social-services expenditure of ₹2,28,403 crore in 2024–25, compared with ₹2,81,039 crore in 2023–24, a decline of 18.73%. This Union accounting category includes education and health but is not total combined Centre-and-state social spending. The decline is not evidence of fraud, waste or a reduction in service quality.",
+      "category": "public_spending",
+      "region": "India",
+      "source_name": "Comptroller and Auditor General of India",
+      "source_url": "https://cag.gov.in/uploads/download_audit_report/2026/6of2026UGEng-069ce496f1158e0.22682438.pdf",
+      "reporting_period": "FY 2024–25 compared with FY 2023–24",
+      "metric_value": "-18.73",
+      "metric_unit": "% year-on-year change in Union social-services expenditure",
+      "evidence_note": "CAG Report No. 6 of 2026, Chapter 2, section 2.7.2, Figure 2.17, printed page 16: Social Services subtotal ₹2,81,039 crore in 2023–24 and ₹2,28,403 crore in 2024–25; YoY -18.73%. Sector includes education, health, housing and other social services; note excludes loans to states/UTs and other specified recipients. Historical FY 2024–25 accounts, not a November 2026 spending update. Verify underlying Union Government Finance Accounts and classification/reclassifications before comparative policy claims. Does not establish misuse, avoidable mortality, or outcomes."
     }
   ]
 }

@@ -142,6 +142,24 @@
       "reviewed_at": "2026-11-21",
       "reviewed_by": "automated-source-review",
       "review_note": "Checked original CAG Report No. 6 of 2026, Chapter 2 section 2.7.2, Figure 2.17, printed p.16: Union Social Services subtotals ₹2,81,039 crore (2023–24) and ₹2,28,403 crore (2024–25), year-on-year -18.73%. Includes education/health among other functions; excludes specified loans; not combined Centre/state spending, fraud or service-outcome evidence. All seven translation dictionaries committed first."
+    },
+    {
+      "item": {
+        "title": "India health and education services inflation in October 2026",
+        "summary": "MoSPI's provisional October 2026 CPI (2024=100) reports year-on-year inflation of 2.05% for health and 4.02% for education services nationally (rural and urban combined). These category price-index changes do not measure hospital bills, school fees for individual families, or access to services.",
+        "category": "other",
+        "region": "India",
+        "source_name": "Ministry of Statistics and Programme Implementation / National Statistics Office",
+        "source_url": "https://static.pib.gov.in/WriteReadData/specificdocs/documents/2026/nov/doc_10457_20261112_15543001.pdf",
+        "source_published_on": "2026-11-12",
+        "reporting_period": "October 2026 compared with October 2025",
+        "metric_value": "2.05",
+        "metric_unit": "% annual CPI inflation, health (education services: 4.02%)",
+        "evidence_note": "NSO CPI October 2026 press release dated 12 Nov 2026, Annexure I, PDF printed page 6, division codes 06 (Health) and 10 (Education services), combined inflation column: 2.05% and 4.02%. Base 2024=100; October 2026 figures provisional; rural and urban combined; changes are year-on-year price indices, not patient spending, tuition fees, or healthcare access. Annexure II provides more detailed group rates. Reviewer should check subsequent revisions and category coverage; no causal attribution."
+      },
+      "reviewed_at": "2026-11-22",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Original NSO/MoSPI CPI October 2026 release dated 12 Nov 2026, Annexure I printed p.6: combined division 06 Health 2.05% and division 10 Education services 4.02%, year-on-year provisional inflation with CPI base 2024=100. Reviewed rural/urban combined definitions, reference October 2025, and caveat that category inflation does not quantify family bills, fees or access. All seven translation dictionaries committed before intake and approval."
     }
   ]
 }

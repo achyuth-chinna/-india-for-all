@@ -115,6 +115,19 @@
       "metric_value": "2.05",
       "metric_unit": "% annual CPI inflation, health (education services: 4.02%)",
       "evidence_note": "NSO CPI October 2026 press release dated 12 Nov 2026, Annexure I, PDF printed page 6, division codes 06 (Health) and 10 (Education services), combined inflation column: 2.05% and 4.02%. Base 2024=100; October 2026 figures provisional; rural and urban combined; changes are year-on-year price indices, not patient spending, tuition fees, or healthcare access. Annexure II provides more detailed group rates. Reviewer should check subsequent revisions and category coverage; no causal attribution."
+    },
+    {
+      "title": "Outpatient medical expenditure in India, 2025",
+      "summary": "The 2025 NSS health survey estimates average out-of-pocket medical expenditure per outpatient episode at ₹861 nationally and ₹289 in public hospitals. These are survey estimates, not prices for equivalent treatments.",
+      "category": "healthcare",
+      "region": "India",
+      "source_name": "Ministry of Statistics and Programme Implementation",
+      "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2253752&lang=2&reg=3",
+      "source_published_on": "2026-04-20",
+      "reporting_period": "January–December 2025 survey",
+      "metric_value": "861",
+      "metric_unit": "₹ per outpatient episode",
+      "evidence_note": "PIB release 20 April 2026, section B Key Findings, outpatient care bullets: national mean ₹861, public hospital mean ₹289, 15-day recall. NSS 80th round January–December 2025; 139,732 households, excludes difficult-to-access Andaman and Nicobar villages. Not matched treatments or total provider costs. Human reviewer should consult full survey tables for outpatient definitions, uncertainty and case mix."
     }
   ]
 }

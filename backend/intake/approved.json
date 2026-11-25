@@ -160,6 +160,24 @@
       "reviewed_at": "2026-11-22",
       "reviewed_by": "automated-source-review",
       "review_note": "Original NSO/MoSPI CPI October 2026 release dated 12 Nov 2026, Annexure I printed p.6: combined division 06 Health 2.05% and division 10 Education services 4.02%, year-on-year provisional inflation with CPI base 2024=100. Reviewed rural/urban combined definitions, reference October 2025, and caveat that category inflation does not quantify family bills, fees or access. All seven translation dictionaries committed before intake and approval."
+    },
+    {
+      "item": {
+        "title": "Outpatient medical expenditure in India, 2025",
+        "summary": "The 2025 NSS health survey estimates average out-of-pocket medical expenditure per outpatient episode at ₹861 nationally and ₹289 in public hospitals. These are survey estimates, not prices for equivalent treatments.",
+        "category": "healthcare",
+        "region": "India",
+        "source_name": "Ministry of Statistics and Programme Implementation",
+        "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2253752&lang=2&reg=3",
+        "source_published_on": "2026-04-20",
+        "reporting_period": "January–December 2025 survey",
+        "metric_value": "861",
+        "metric_unit": "₹ per outpatient episode",
+        "evidence_note": "PIB release 20 April 2026, section B Key Findings, outpatient care bullets: national mean ₹861, public hospital mean ₹289, 15-day recall. NSS 80th round January–December 2025; 139,732 households, excludes difficult-to-access Andaman and Nicobar villages. Not matched treatments or total provider costs. Human reviewer should consult full survey tables for outpatient definitions, uncertainty and case mix."
+      },
+      "reviewed_at": "2026-11-25",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Original PIB release section B Key Findings and endnote checked: both means, national geography, 2025 survey and outpatient episode scope confirmed; 15-day recall, no equivalent-treatment price inference. Seven locale updates committed first."
     }
   ]
 }

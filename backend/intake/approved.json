@@ -178,6 +178,24 @@
       "reviewed_at": "2026-11-25",
       "reviewed_by": "automated-source-review",
       "review_note": "Original PIB release section B Key Findings and endnote checked: both means, national geography, 2025 survey and outpatient episode scope confirmed; 15-day recall, no equivalent-treatment price inference. Seven locale updates committed first."
+    },
+    {
+      "item": {
+        "title": "Hospitalization medical expenditure in India, 2025",
+        "summary": "Average out-of-pocket medical expenditure per hospitalization, excluding childbirth, was ₹6,631 in public facilities and ₹50,508 in private hospitals. The respective medians were ₹1,100 and ₹24,000. These survey estimates do not compare identical treatments.",
+        "category": "healthcare",
+        "region": "India",
+        "source_name": "Ministry of Statistics and Programme Implementation",
+        "source_url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2253752&lang=2&reg=3",
+        "source_published_on": "2026-04-20",
+        "reporting_period": "January–December 2025 survey",
+        "metric_value": "6631",
+        "metric_unit": "₹ average per hospitalization in public facilities",
+        "evidence_note": "NSS 80th round press note, sections B key findings, B5 I table and endnote D(c). 365-day recall, childbirth excluded; medical expenditure net of insurance/employer reimbursement. Private category includes government-empanelled hospitals. Survey excludes difficult-to-access Andaman and Nicobar villages. No case-mix adjustment or causal claim. Further human review should examine full report, sampling errors and state estimates. Historical release, rechecked 26 November 2026."
+      },
+      "reviewed_at": "2026-11-26",
+      "reviewed_by": "automated-source-review",
+      "review_note": "Original MoSPI PIB release dated 20 April 2026, B key findings, B5 I table and endnote D(c): verified public/private means and medians, national geography, 2025 survey and childbirth exclusion; private includes empanelled hospitals. Estimates net of reimbursements, not matched treatment prices. Seven dictionaries committed before intake and approval. Full report sampling uncertainty and state breakdowns remain for further review."
     }
   ]
 }
